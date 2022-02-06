@@ -2,7 +2,6 @@ package android.example.tinkoff.main
 
 import android.example.tinkoff.R
 import android.example.tinkoff.network.Api
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -69,8 +68,6 @@ class LastViewModel : ViewModel() {
     }
 
     private val _response2 = MutableLiveData<String>()
-    val response2: LiveData<String>
-        get() = _response2
 
     fun onNext() {
         if (_index.value!! < images.size - 1 && images.isNotEmpty() && texts.isNotEmpty()) {
@@ -87,12 +84,15 @@ class LastViewModel : ViewModel() {
         _response2.value = ""
         uiScope.launch {
             try {
-                val first = Api.retrofitService.getLast()
+                val first = Api.retrofitService.getRandom()
                 withContext(Dispatchers.Main) {
                     if (first.isSuccessful) {
                         _response2.value = first.body()
 
-                        if (_response2.value?.contains("gifURL") == true) {
+                        if (_response2.value?.contains("gifURL") == true && _response2.value?.contains(
+                                "description"
+                            ) == true
+                        ) {
                             val jsonLL = JSONObject(_response2.value!!)
                             images.add("https" + jsonLL.getString("gifURL").substring(4))
                             texts.add(jsonLL.getString("description"))

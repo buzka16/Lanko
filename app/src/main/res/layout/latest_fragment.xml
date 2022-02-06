@@ -36,9 +36,9 @@
                     android:layout_height="50dp"
                     android:background="@color/white"
                     android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:onClick="@{()->hotViewModel.onBack()}"
+                    android:onClick="@{()->latestViewModel.onBack()}"
                     android:scaleType="fitCenter"
-                    app:imageResource="@{hotViewModel.imageBack}"
+                    app:imageResource="@{latestViewModel.imageBack}"
                     tools:ignore="SpeakableTextPresentCheck" />
             </androidx.cardview.widget.CardView>
 
@@ -62,7 +62,7 @@
                     android:layout_height="50dp"
                     android:background="@color/white"
                     android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:onClick="@{()->hotViewModel.onNext()}"
+                    android:onClick="@{()->latestViewModel.onNext()}"
                     android:scaleType="fitCenter"
                     android:src="@mipmap/next"
                     tools:ignore="SpeakableTextPresentCheck" />
@@ -97,7 +97,11 @@
                     android:layout_gravity="bottom"
                     android:paddingStart="6dp"
                     android:paddingBottom="4dp"
-                    android:text="@{hotViewModel.text}"
+                    android:shadowColor="@color/white"
+                    android:shadowDx="1.5"
+                    android:shadowDy="1.3"
+                    android:shadowRadius="1.9"
+                    android:text="@{latestViewModel.text}"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     tools:text="Test TEXT" />
@@ -116,7 +120,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:onClick="@{()->hotViewModel.getImageOnline()}"
+                android:onClick="@{()->latestViewModel.getImageOnline()}"
                 android:text="ПОВТОРИТЬ"
                 android:textColor="@android:color/holo_blue_dark"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -141,7 +145,7 @@
                 android:id="@+id/noNetworkTextViewB"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Произошла ошибка при загрузке данных. Провертье подключение к сети."
+                android:text="Произошла ошибка при загрузке данных. Проверьте подключение к сети."
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 app:layout_constraintBottom_toTopOf="@+id/networkButtonB"
@@ -156,7 +160,7 @@
     <data>
 
         <variable
-            name="hotViewModel"
-            type="android.example.tinkoff.main.HotViewModel" />
+            name="latestViewModel"
+            type="android.example.tinkoff.main.LatestViewModel" />
     </data>
 </layout>

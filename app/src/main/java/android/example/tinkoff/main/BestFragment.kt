@@ -1,6 +1,5 @@
 package android.example.tinkoff.main
 
-import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,10 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.example.tinkoff.R
 import android.example.tinkoff.databinding.BestFragmentBinding
-import android.net.ConnectivityManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -31,14 +28,14 @@ class BestFragment : Fragment() {
             inflater, R.layout.best_fragment, container, false
         )
 
-        viewModel = ViewModelProvider(this).get(BestViewModel::class.java)
+        viewModel = ViewModelProvider(this)[BestViewModel::class.java]
         binding.bestViewModel = viewModel
 
         viewModel.index.observe(
-            viewLifecycleOwner,
-            Observer { viewModel.switchBack() })
+            viewLifecycleOwner
+        ) { viewModel.switchBack() }
 
-        viewModel.networkStatus.observe(viewLifecycleOwner, Observer { status ->
+        viewModel.networkStatus.observe(viewLifecycleOwner) { status ->
             when (status) {
                 0 -> {
                     binding.networkC.visibility = View.VISIBLE
@@ -59,8 +56,16 @@ class BestFragment : Fragment() {
                     binding.networkC.visibility = View.VISIBLE
                     binding.noNetworkC.visibility = View.GONE
                 }
+                -2 -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Лучшие : вы просмотрели все!",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
             }
-        })
+        }
 
 
         val circularProgressDrawable = CircularProgressDrawable(binding.imageViewC.context).apply {
@@ -71,7 +76,7 @@ class BestFragment : Fragment() {
 
         binding.imageViewC.setImageDrawable(circularProgressDrawable)
 
-        viewModel.image.observe(viewLifecycleOwner, Observer { newImage ->
+        viewModel.image.observe(viewLifecycleOwner) { newImage ->
             Glide.with(requireContext())
                 .load(newImage)
                 .asGif()
@@ -79,7 +84,7 @@ class BestFragment : Fragment() {
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(binding.imageViewC)
-        })
+        }
 
         viewModel.getImageOnline()
 

@@ -1,6 +1,5 @@
 package android.example.tinkoff.main
 
-import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,19 +7,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.example.tinkoff.R
-import android.example.tinkoff.databinding.HotFragmentBinding
-import android.net.ConnectivityManager
+import android.example.tinkoff.databinding.LatestFragmentBinding
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 
-class HotFragment : Fragment() {
+class LatestFragment : Fragment() {
 
-    private lateinit var binding: HotFragmentBinding
-    private lateinit var viewModel: HotViewModel
+    private lateinit var binding: LatestFragmentBinding
+    private lateinit var viewModel: LatestViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,17 +25,17 @@ class HotFragment : Fragment() {
     ): View {
 
         binding = DataBindingUtil.inflate(
-            inflater, R.layout.hot_fragment, container, false
+            inflater, R.layout.latest_fragment, container, false
         )
 
-        viewModel = ViewModelProvider(this).get(HotViewModel::class.java)
-        binding.hotViewModel = viewModel
+        viewModel = ViewModelProvider(this)[LatestViewModel::class.java]
+        binding.latestViewModel = viewModel
 
         viewModel.index.observe(
-            viewLifecycleOwner,
-            Observer { viewModel.switchBack() })
+            viewLifecycleOwner
+        ) { viewModel.switchBack() }
 
-        viewModel.networkStatus.observe(viewLifecycleOwner, Observer { status ->
+        viewModel.networkStatus.observe(viewLifecycleOwner) { status ->
             when (status) {
                 0 -> {
                     binding.networkB.visibility = View.VISIBLE
@@ -46,7 +43,7 @@ class HotFragment : Fragment() {
 
                     Toast.makeText(
                         requireContext(),
-                        "Горячие : ошибка загрузки GIF!",
+                        "Последние : ошибка загрузки GIF!",
                         Toast.LENGTH_LONG
                     )
                         .show()
@@ -59,8 +56,16 @@ class HotFragment : Fragment() {
                     binding.networkB.visibility = View.VISIBLE
                     binding.noNetworkB.visibility = View.GONE
                 }
+                -2 -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Последние : вы просмотрели все!",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
             }
-        })
+        }
 
 
         val circularProgressDrawable = CircularProgressDrawable(binding.imageViewB.context).apply {
@@ -69,7 +74,7 @@ class HotFragment : Fragment() {
         }
         circularProgressDrawable.start()
 
-        viewModel.image.observe(viewLifecycleOwner, Observer { newImage ->
+        viewModel.image.observe(viewLifecycleOwner) { newImage ->
             Glide.with(requireContext())
                 .load(newImage)
                 .asGif()
@@ -77,7 +82,7 @@ class HotFragment : Fragment() {
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(binding.imageViewB)
-        })
+        }
 
         viewModel.getImageOnline()
 

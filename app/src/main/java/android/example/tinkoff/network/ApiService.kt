@@ -16,10 +16,10 @@ private val retrofit = Retrofit.Builder()
 
 interface ApiService {
     @GET("random?json=true")
-    suspend fun getLast(): Response<String?>
+    suspend fun getRandom(): Response<String?>
 
     @GET
-    suspend fun getHot(@Url url: String): Response<String?>
+    suspend fun getLatest(@Url url: String): Response<String?>
 
     @GET
     suspend fun getBest(@Url url: String): Response<String?>

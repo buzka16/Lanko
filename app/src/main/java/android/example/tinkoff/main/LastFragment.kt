@@ -1,7 +1,5 @@
 package android.example.tinkoff.main
 
-import android.app.Activity
-import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -10,17 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.example.tinkoff.R
 import android.example.tinkoff.databinding.LastFragmentBinding
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.net.NetworkInfo
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import kotlinx.android.synthetic.main.last_fragment.*
 
 class LastFragment : Fragment() {
 
@@ -36,14 +28,14 @@ class LastFragment : Fragment() {
             inflater, R.layout.last_fragment, container, false
         )
 
-        viewModel = ViewModelProvider(this).get(LastViewModel::class.java)
+        viewModel = ViewModelProvider(this)[LastViewModel::class.java]
         binding.lastViewModel = viewModel
 
         viewModel.index.observe(
-            viewLifecycleOwner,
-            Observer { viewModel.switchBack() })
+            viewLifecycleOwner
+        ) { viewModel.switchBack() }
 
-        viewModel.networkStatus.observe(viewLifecycleOwner, Observer { status ->
+        viewModel.networkStatus.observe(viewLifecycleOwner) { status ->
             when (status) {
                 0 -> {
                     binding.networkA.visibility = View.VISIBLE
@@ -51,7 +43,7 @@ class LastFragment : Fragment() {
 
                     Toast.makeText(
                         requireContext(),
-                        "Последние : ошибка загрузки GIF!",
+                        "Рандомные : ошибка загрузки GIF!",
                         Toast.LENGTH_LONG
                     )
                         .show()
@@ -65,7 +57,7 @@ class LastFragment : Fragment() {
                     binding.noNetworkA.visibility = View.GONE
                 }
             }
-        })
+        }
 
 
         val circularProgressDrawable = CircularProgressDrawable(binding.imageViewA.context).apply {
@@ -76,7 +68,7 @@ class LastFragment : Fragment() {
 
         binding.imageViewA.setImageDrawable(circularProgressDrawable)
 
-        viewModel.image.observe(viewLifecycleOwner, Observer { newImage ->
+        viewModel.image.observe(viewLifecycleOwner) { newImage ->
             Glide.with(requireContext())
                 .load(newImage)
                 .asGif()
@@ -84,7 +76,7 @@ class LastFragment : Fragment() {
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(binding.imageViewA)
-        })
+        }
 
         viewModel.getImageOnline()
 

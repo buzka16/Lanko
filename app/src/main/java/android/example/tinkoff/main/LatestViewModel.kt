@@ -2,7 +2,6 @@ package android.example.tinkoff.main
 
 import android.example.tinkoff.R
 import android.example.tinkoff.network.Api
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,11 +9,12 @@ import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.lang.Exception
 
-class HotViewModel : ViewModel() {
+class LatestViewModel : ViewModel() {
 
     private var images = ArrayList<String>()
     private var texts = ArrayList<String>()
     private var count = 0
+    private var countMax = -1
 
 
     private var viewModelJob = Job()
@@ -70,8 +70,6 @@ class HotViewModel : ViewModel() {
     }
 
     private val _response2 = MutableLiveData<String>()
-    val response2: LiveData<String>
-        get() = _response2
 
     fun onNext() {
         if (_index.value!! < images.size - 1 && images.isNotEmpty() && texts.isNotEmpty()) {
@@ -89,15 +87,20 @@ class HotViewModel : ViewModel() {
         uiScope.launch {
             try {
                 val first =
-                    Api.retrofitService.getHot("https://developerslife.ru/hot/${count / 5}?json=true")
+                    Api.retrofitService.getLatest("https://developerslife.ru/latest/${count / 5}?json=true")
                 withContext(Dispatchers.Main) {
                     if (first.isSuccessful) {
                         _response2.value = first.body()
 
-                        if (_response2.value?.contains("gifURL") == true) {
+                        if (_response2.value?.contains("gifURL") == true && _response2.value?.contains(
+                                "description"
+                            ) == true
+                        ) {
                             val jsonLL = JSONObject(_response2.value!!)
                             val jsonLLL =
                                 JSONObject(jsonLL.getJSONArray("result")[count % 5].toString())
+                            if (countMax == -1)
+                                countMax = jsonLL.getInt("totalCount")
                             images.add(
                                 "https" + jsonLLL.getString("gifURL").substring(4)
                             )
@@ -106,13 +109,17 @@ class HotViewModel : ViewModel() {
                             _text.value = texts[texts.size - 1]
                             _index.value = texts.size - 1
                             _networkStatus.value = 1
-                            count++
+                            if (count <= countMax)
+                                count++
                         } else
                             _networkStatus.value = 0
                     }
                 }
             } catch (e: Exception) {
-                _networkStatus.value = -1
+                if (count >= countMax && countMax != -1)
+                    _networkStatus.value = -2
+                else
+                    _networkStatus.value = -1
             }
         }
     }

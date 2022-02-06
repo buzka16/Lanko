@@ -23,7 +23,7 @@ class TheFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate<TheFragmentBinding>(
             inflater, R.layout.the_fragment, container, false
         )
@@ -37,9 +37,9 @@ class TheFragment : Fragment() {
         val tabLayout = binding.tabLayout
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             when (position) {
-                0 -> tab.text = "Последние"
+                0 -> tab.text = "Рандомные"
                 1 -> tab.text = "Лучшие"
-                2 -> tab.text = "Горячие"
+                2 -> tab.text = "Последние"
             }
         }.attach()
     }
@@ -50,14 +50,13 @@ class CollectionAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int = 3
 
     override fun createFragment(position: Int): Fragment {
-        // Return a NEW fragment instance in createFragment(int)
         val fragment = when (position) {
             0 -> LastFragment()
             1 -> BestFragment()
-            else -> HotFragment()
+            else -> LatestFragment()
         }
         fragment.arguments = Bundle().apply {
-            // Our object is just an integer :-P
+            // Our object is just an integer
             putInt(ARG_OBJECT, position + 1)
         }
         return fragment
